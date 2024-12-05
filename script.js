@@ -4,7 +4,31 @@ function handleError(error) {
   console.error("Deu ruim: ", error.message);
 }
 
-async function getTopFiveSongs() {
+async function fetchSongs(
+  url,
+  headers = {
+    "X-Parse-Application-Id": config.applicationId,
+    "X-Parse-REST-API-Key": config.restAPIKey,
+    "Content-Type": "application/json",
+  }
+) {
+  /**
+   * Solicita para o backend as músicas que quer.
+   *
+   * url (str): url com os parâmetros de busca
+   * headers (Object).
+   */
+  const response = await fetch(url, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
+  }
+
+  const { results } = await response.json();
+  return results;
+}
+
+async function fetchTopFiveSongs() {
   /**
    * Recupera as top 5 músicas e renderiza para o front end.
    */
@@ -52,28 +76,38 @@ function renderSongsList(elementId, songs) {
   });
 }
 
-async function fetchSongs(
-  url,
-  headers = {
-    "X-Parse-Application-Id": config.applicationId,
-    "X-Parse-REST-API-Key": config.restAPIKey,
-    "Content-Type": "application/json",
-  }
-) {
+function renderBPMSongsList(elementId, songs) {
   /**
-   * Solicita para o backend as músicas que quer.
-   *
-   * url (str): url com os parâmetros de busca
-   * headers (Object).
+   * Formata as músicas encontradas em HTML
    */
-  const response = await fetch(url, { headers });
+  const songsList = document.getElementById(elementId);
 
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status} ${response.statusText}`);
-  }
+  songsList.innerHTML = "";
 
-  const { results } = await response.json();
-  return results;
+  songs.forEach((song) => {
+    const listItem = document.createElement("li");
+    listItem.classList.add(
+      "list-group-item",
+      "bg-success",
+      "bg-opacity-10",
+      "text-light",
+      "border",
+      "border-0"
+    );
+    listItem.innerHTML = `
+      <span class="fs-4 fw-bold">${song.track_name}</span><br>
+      <span class="fs-6 fw-light">Artista:</span> <span class="fs-5 fw-semibold">${
+        song.artist_name
+      }</span><br>
+      <span class="fs-6 fw-light">BPM:</span> <span class="text-danger-emphasis fs-5 fw-semibold">${
+        song.bpm
+      }</span><br>
+      <span class="fs-6 fw-light">Streams:</span> <span class="fs-5 fw-semibold">${song.streams.toLocaleString(
+        "pt-br"
+      )}</span>
+    `;
+    songsList.appendChild(listItem);
+  });
 }
 
 async function getLyrics(artistName, trackName) {
@@ -106,5 +140,45 @@ function renderLyrics(elementId, lyrics) {
   lyricsDisplay = lyrics; // Falta formatar
 }
 
+async function getTopArtists() {
+  // pegar as infos do back4app
+  // formatar em html
+  // mandar pro frontend
+}
+
+async function fetchSongsByBpm(minBpm, maxBpm) {
+  try {
+    const url = `https://parseapi.back4app.com/parse/classes/songs?order=-streams&limit=3&keys=track_name,artist_name,streams,bpm&where=${encodeURIComponent(
+      JSON.stringify({ bpm: { $gte: minBpm, $lte: maxBpm } })
+    )}`;
+
+    const songs = await fetchSongs(url);
+
+    renderBPMSongsList("bpm-list", songs);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Event listeners
+document.addEventListener("DOMContentLoaded", () => {
+  const bpmForm = document.getElementById("bpm-form");
+
+  bpmForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const minBpm = parseInt(document.getElementById("min-bpm").value, 10);
+    const maxBpm = parseInt(document.getElementById("max-bpm").value, 10);
+
+    if (minBpm && maxBpm && minBpm <= maxBpm) {
+      fetchSongsByBpm(minBpm, maxBpm);
+    } else {
+      alert("Please enter a valid BPM range.");
+    }
+  });
+});
+
 // Funções executadas ao carregar a página
-getTopFiveSongs();
+fetchTopFiveSongs();
+fetchSongsByBpm(100, 120);
+getTopArtists();
