@@ -1,49 +1,89 @@
 import { config } from "./config.js";
 
+function handleError(error) {
+  console.error("Deu ruim: ", error.message);
+}
+
 async function getTopFiveSongs() {
+  /**
+   * Recupera as top 5 músicas e renderiza para o front end.
+   */
   try {
-    const response = await fetch(
-      "https://parseapi.back4app.com/parse/classes/songs?order=-streams&limit=5&keys=track_name,artist_name,streams",
-      {
-        headers: {
-          "X-Parse-Application-Id": config.applicationId,
-          "X-Parse-REST-API-Key": config.restAPIKey,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const url = "https://parseapi.back4app.com/parse/classes/songs";
+    const params =
+      "?order=-streams&limit=5&keys=track_name,artist_name,streams";
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
-
-    const { results } = await response.json();
-
-    // return results;
-    const songsList = document.getElementById("songs-list");
-
-    songsList.innerHTML = "";
-
-    results.forEach((song) => {
-      const listItem = document.createElement("li");
-      listItem.innerHTML = `
-        <strong>${song.track_name}</strong><br>
-        Artist: ${song.artist_name}<br>
-        Streams: ${song.streams}
-      `;
-      songsList.appendChild(listItem);
+    const songs = await fetchSongs(`${url}${params}`, {
+      "X-Parse-Application-Id": config.applicationId,
+      "X-Parse-REST-API-Key": config.restAPIKey,
+      "Content-Type": "application/json",
     });
+
+    renderSongsList("songs-list", songs);
   } catch (error) {
-    console.error("Deu ruim: ", error.message);
+    handleError(error);
   }
 }
 
-// const [song1, song2, song3, song4, song5] = await getTopFiveSongs();
+function renderSongsList(elementId, songs) {
+  /**
+   * Formata as músicas encontradas em HTML
+   */
+  const songsList = document.getElementById(elementId);
 
-// console.log("Song 1:", song1);
-// console.log("Song 2:", song2);
-// console.log("Song 3:", song3);
-// console.log("Song 4:", song4);
-// console.log("Song 5:", song5);
+  if (!songsList) {
+    throw new Error(`Element with id "${elementId}" not found`);
+  }
+
+  songsList.innerHTML = "";
+
+  songs.forEach((song) => {
+    const listItem = document.createElement("li");
+    listItem.innerHTML = `
+      <strong>${song.track_name}</strong><br>
+      Artist: ${song.artist_name}<br>
+      Streams: ${song.streams}
+    `;
+    songsList.appendChild(listItem);
+  });
+}
+
+async function fetchSongs(url, headers) {
+  /**
+   * Solicita para o backend as músicas que quer.
+   *
+   * url (str): url com os parâmetros de busca
+   * headers (Object).
+   */
+  const response = await fetch(url, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
+  }
+
+  const { results } = await response.json();
+  return results;
+}
+
+async function getLyrics(artistName, trackName) {
+  artistName = encodeURIComponent(artistName);
+  trackName = encodeURIComponent(trackName);
+
+  try {
+    const response = await fetch(
+      `https://api.lyrics.ovh/v1/${artistName}/${trackName}`
+    );
+  } catch (error) {
+    handleError(error);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
+  }
+
+  const result = response.json();
+
+  return result;
+}
 
 getTopFiveSongs();
