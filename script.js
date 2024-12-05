@@ -13,11 +13,7 @@ async function getTopFiveSongs() {
     const params =
       "?order=-streams&limit=5&keys=track_name,artist_name,streams";
 
-    const songs = await fetchSongs(`${url}${params}`, {
-      "X-Parse-Application-Id": config.applicationId,
-      "X-Parse-REST-API-Key": config.restAPIKey,
-      "Content-Type": "application/json",
-    });
+    const songs = await fetchSongs(`${url}${params}`);
 
     renderSongsList("songs-list", songs);
   } catch (error) {
@@ -56,7 +52,14 @@ function renderSongsList(elementId, songs) {
   });
 }
 
-async function fetchSongs(url, headers) {
+async function fetchSongs(
+  url,
+  headers = {
+    "X-Parse-Application-Id": config.applicationId,
+    "X-Parse-REST-API-Key": config.restAPIKey,
+    "Content-Type": "application/json",
+  }
+) {
   /**
    * Solicita para o backend as músicas que quer.
    *
