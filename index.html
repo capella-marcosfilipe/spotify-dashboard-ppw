@@ -29,12 +29,46 @@
       rel="stylesheet"
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous" />
+      <link href="style.css" rel="stylesheet" />
     <script type="module" src="script.js" defer></script>
   </head>
-  <body>
+  <body class="d-flex">
     <!-- sidebar -->
-    <main class="d-flex flex-fill justify-content-around flex-wrap">
-      <div class="col-3 border border-2 rounded border-success bg-success bg-opacity-75 text-light" id="top5">
+    <ul class="navbar-nav bg-dark text-white sidebar" id="accordionSidebar">
+      <a class="navbar-brand d-flex align-items-center justify-content-center text-white" href="#">
+          <span class="mx-2">Melhores<br>do Spotify</span>
+      </a>
+
+      <!-- Divider -->
+      <hr class="border-secondary">
+
+      <!-- Heading -->
+      <div class="small text-uppercase fw-bold text-secondary px-3">Grupo</div>
+
+      <li class="nav-item text-white">
+        Marcos Capella
+      </li>
+      <li class="nav-item text-white">
+        Marcela Dias
+      </li>
+
+      <!-- Divider -->
+      <hr class="border-secondary">
+
+      <!-- Heading -->
+      <div class="small text-uppercase fw-bold text-secondary px-3">Dataset</div>
+
+      <!-- Nav Item - Pages -->
+      <li class="nav-item">
+          <a class="nav-link text-white" href="https://www.kaggle.com/datasets/abdulszz/spotify-most-streamed-songs">
+              <span>Kaggle</span>
+          </a>
+      </li>
+    </ul>
+
+    <!-- dashboard -->
+    <main class="p-4 col-11 d-flex justify-content-around flex-wrap">
+      <div class="p-2 col-3 border border-2 rounded border-success bg-success bg-opacity-75 align-self-start" id="top5">
         <h2 class="fs-3 fw-bold">Top 5 mais ouvidas</h1>
         <ul class="list-group list-group-numbered border border-0" id="songs-list">
           <!-- Top 5 aqui -->
