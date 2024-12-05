@@ -31,10 +31,6 @@ function renderSongsList(elementId, songs) {
    */
   const songsList = document.getElementById(elementId);
 
-  if (!songsList) {
-    throw new Error(`Element with id "${elementId}" not found`);
-  }
-
   songsList.innerHTML = "";
 
   songs.forEach((song) => {
@@ -83,7 +79,17 @@ async function getLyrics(artistName, trackName) {
 
   const result = response.json();
 
-  return result;
+  renderLyrics("lyrics-display", result);
 }
 
+function renderLyrics(elementId, lyrics) {
+  /**
+   * Formata a letra das músicas em HTML
+   */
+  const lyricsDisplay = document.getElementById(elementId);
+
+  lyricsDisplay = lyrics; // Falta formatar
+}
+
+// Funções executadas ao carregar a página
 getTopFiveSongs();
