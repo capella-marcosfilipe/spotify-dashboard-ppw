@@ -8,6 +8,10 @@ Este projeto foi desenvolvido para a cadeira "Programação para Web" do curso d
 - JavaScript
 - Back4App
 
-## Dataset utilizado
+## API(s) utilizada(s)
 
-[Spotify Most Streamed Songs](https://www.kaggle.com/datasets/abdulszz/spotify-most-streamed-songs) no Kaggle
+- [lyrics.ovh](https://lyricsovh.docs.apiary.io) - para solicitação de letras de músicas
+
+## Dataset(s) utilizado(s)
+
+- [Spotify Most Streamed Songs](https://www.kaggle.com/datasets/abdulszz/spotify-most-streamed-songs) no Kaggle
