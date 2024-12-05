@@ -6,10 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "spotify",
+    "dashboard"
+  ],
+  "author": "Marcos Filipe Gonçalves Capella (github.com/capella-marcosfilipe)",
   "license": "ISC",
-  "description": "",
+  "description": "Dashboard com as Melhores Músicas do Spotify",
   "dependencies": {
     "spotify-dashboard-ppw": "file:"
   }

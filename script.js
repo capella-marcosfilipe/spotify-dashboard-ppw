@@ -35,10 +35,22 @@ function renderSongsList(elementId, songs) {
 
   songs.forEach((song) => {
     const listItem = document.createElement("li");
+    listItem.classList.add(
+      "list-group-item",
+      "bg-success",
+      "bg-opacity-10",
+      "text-light",
+      "border",
+      "border-0"
+    );
     listItem.innerHTML = `
-      <strong>${song.track_name}</strong><br>
-      Artist: ${song.artist_name}<br>
-      Streams: ${song.streams}
+      <span class="fs-4 fw-bold">${song.track_name}</span><br>
+      <span class="fs-6 fw-light">Artista:</span> <span class="fs-5 fw-semibold">${
+        song.artist_name
+      }</span><br>
+      <span class="fs-6 fw-light">Streams:</span> <span class="fs-5 fw-semibold">${song.streams.toLocaleString(
+        "pt-br"
+      )}</span>
     `;
     songsList.appendChild(listItem);
   });
