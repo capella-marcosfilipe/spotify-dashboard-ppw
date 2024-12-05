@@ -64,11 +64,11 @@ function renderSongsList(elementId, songs) {
       "border-0"
     );
     listItem.innerHTML = `
-      <span class="fs-4 fw-bold">${song.track_name}</span><br>
+      <span class="fs-5 fw-bold">${song.track_name}</span><br>
       <span class="fs-6 fw-light">Artista:</span> <span class="fs-5 fw-semibold">${
         song.artist_name
       }</span><br>
-      <span class="fs-6 fw-light">Streams:</span> <span class="fs-5 fw-semibold">${song.streams.toLocaleString(
+      <span class="fs-6 fw-light">Streams:</span> <span class="fs-6 fw-semibold">${song.streams.toLocaleString(
         "pt-br"
       )}</span>
     `;
@@ -95,14 +95,14 @@ function renderBPMSongsList(elementId, songs) {
       "border-0"
     );
     listItem.innerHTML = `
-      <span class="fs-4 fw-bold">${song.track_name}</span><br>
-      <span class="fs-6 fw-light">Artista:</span> <span class="fs-5 fw-semibold">${
+      <span class="fs-5 fw-bold">${song.track_name}</span><br>
+      <span class="fs-6 fw-light">Artista:</span> <span class="fs-6 fw-semibold">${
         song.artist_name
       }</span><br>
-      <span class="fs-6 fw-light">BPM:</span> <span class="text-danger-emphasis fs-5 fw-semibold">${
+      <span class="fs-6 fw-light">BPM:</span> <span class="text-danger-emphasis fs-6 fw-semibold">${
         song.bpm
       }</span><br>
-      <span class="fs-6 fw-light">Streams:</span> <span class="fs-5 fw-semibold">${song.streams.toLocaleString(
+      <span class="fs-6 fw-light">Streams:</span> <span class="fs-6 fw-semibold">${song.streams.toLocaleString(
         "pt-br"
       )}</span>
     `;
@@ -146,7 +146,7 @@ async function getTopArtists() {
   // mandar pro frontend
 }
 
-async function fetchSongsByBpm(minBpm, maxBpm) {
+async function fetchSongsByBpm(minBpm = 100, maxBpm = 120) {
   try {
     const url = `https://parseapi.back4app.com/parse/classes/songs?order=-streams&limit=3&keys=track_name,artist_name,streams,bpm&where=${encodeURIComponent(
       JSON.stringify({ bpm: { $gte: minBpm, $lte: maxBpm } })
@@ -173,12 +173,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (minBpm && maxBpm && minBpm <= maxBpm) {
       fetchSongsByBpm(minBpm, maxBpm);
     } else {
-      alert("Please enter a valid BPM range.");
+      alert("Por favor, coloque um intervalo válido de BPM");
     }
   });
 });
 
 // Funções executadas ao carregar a página
 fetchTopFiveSongs();
-fetchSongsByBpm(100, 120);
+fetchSongsByBpm();
 getTopArtists();
