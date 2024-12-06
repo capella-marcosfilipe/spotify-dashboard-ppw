@@ -1,5 +1,7 @@
 import { config } from "./config.js";
 
+// Métodos genéricos ========================
+
 function handleError(error) {
   console.error("Deu ruim: ", error.message);
 }
@@ -27,6 +29,8 @@ async function fetchSongs(
   const { results } = await response.json();
   return results;
 }
+
+// Métodos de Top 5 músicas ========================
 
 async function fetchTopFiveSongs() {
   /**
@@ -76,6 +80,22 @@ function renderSongsList(elementId, songs) {
   });
 }
 
+// Métodos de Músicas por BPM ========================
+
+async function fetchSongsByBpm(minBpm = 100, maxBpm = 120) {
+  try {
+    const url = `https://parseapi.back4app.com/parse/classes/songs?order=-streams&limit=3&keys=track_name,artist_name,streams,bpm&where=${encodeURIComponent(
+      JSON.stringify({ bpm: { $gte: minBpm, $lte: maxBpm } })
+    )}`;
+
+    const songs = await fetchSongs(url);
+
+    renderBPMSongsList("bpm-list", songs);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 function renderBPMSongsList(elementId, songs) {
   /**
    * Formata as músicas encontradas em HTML
@@ -110,57 +130,108 @@ function renderBPMSongsList(elementId, songs) {
   });
 }
 
-async function getLyrics(artistName, trackName) {
-  artistName = encodeURIComponent(artistName);
-  trackName = encodeURIComponent(trackName);
+// Métodos de Encontre a letra ========================
 
+const getLyricsButton = document.getElementById("get-lyrics");
+const lyricsDiv = document.getElementById("lyrics");
+const artistSelect = document.getElementById("artist-select");
+const songSelect = document.getElementById("song-select");
+
+// Alimentar seletor de artistas
+async function fetchArtistsForSelect() {
   try {
     const response = await fetch(
-      `https://api.lyrics.ovh/v1/${artistName}/${trackName}`
+      `https://parseapi.back4app.com/parse/classes/songs?keys=artist_name`,
+      {
+        headers: {
+          "X-Parse-Application-Id": config.applicationId,
+          "X-Parse-REST-API-Key": config.restAPIKey,
+        },
+      }
     );
+
+    const { results } = await response.json();
+
+    const uniqueArtists = [...new Set(results.map((song) => song.artist_name))];
+
+    uniqueArtists.forEach((artist) => {
+      const option = document.createElement("option");
+      option.value = artist;
+      option.textContent = artist;
+      artistSelect.appendChild(option);
+    });
   } catch (error) {
     handleError(error);
   }
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status} ${response.statusText}`);
-  }
-
-  const result = response.json();
-
-  renderLyrics("lyrics-display", result);
 }
 
+// Alimentar seletor de músicas por artista escolhido
+async function fetchSongsByArtistForSelect(artist) {
+  try {
+    const response = await fetch(
+      `https://parseapi.back4app.com/parse/classes/songs?keys=track_name,artist_name&where=${encodeURIComponent(
+        JSON.stringify({ artist_name: artist })
+      )}`,
+      {
+        headers: {
+          "X-Parse-Application-Id": config.applicationId,
+          "X-Parse-REST-API-Key": config.restAPIKey,
+        },
+      }
+    );
+
+    const { results } = await response.json();
+
+    results.forEach((song) => {
+      const option = document.createElement("option");
+      option.value = song.track_name;
+      option.textContent = song.track_name;
+      songSelect.appendChild(option);
+    });
+
+    songSelect.disabled = false;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Busca Música com as informações selecionadas pelo usuário
+async function fetchLyrics(artistName, trackName) {
+  const encodedArtist = encodeURIComponent(artistName);
+  const encodedSong = encodeURIComponent(trackName);
+
+  const url = `https://private-anon-77d17e283b-lyricsovh.apiary-proxy.com/v1/${encodedArtist}/${encodedSong}`;
+  console.log(url);
+
+  try {
+    const response = await fetch(url);
+    const result = await response.json();
+
+    console.log(result.lyrics);
+
+    if (result && result.lyrics) {
+      renderLyrics("lyrics", result.lyrics);
+    } else {
+      renderLyrics("lyrics", "Lyrics not found.");
+    }
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Método auxiliar de fetchLyrics para renderizar
 function renderLyrics(elementId, lyrics) {
   /**
    * Formata a letra das músicas em HTML
    */
   const lyricsDisplay = document.getElementById(elementId);
+  lyricsDisplay.innerHTML = "";
 
-  lyricsDisplay = lyrics; // Falta formatar
+  const formattedLyrics = lyrics.replace(/(\r\n|\n|\r)/g, "<br>");
+  lyricsDisplay.innerHTML = formattedLyrics;
 }
 
-async function getTopArtists() {
-  // pegar as infos do back4app
-  // formatar em html
-  // mandar pro frontend
-}
-
-async function fetchSongsByBpm(minBpm = 100, maxBpm = 120) {
-  try {
-    const url = `https://parseapi.back4app.com/parse/classes/songs?order=-streams&limit=3&keys=track_name,artist_name,streams,bpm&where=${encodeURIComponent(
-      JSON.stringify({ bpm: { $gte: minBpm, $lte: maxBpm } })
-    )}`;
-
-    const songs = await fetchSongs(url);
-
-    renderBPMSongsList("bpm-list", songs);
-  } catch (error) {
-    handleError(error);
-  }
-}
-
-// Event listeners
+// Event listeners ========================
 document.addEventListener("DOMContentLoaded", () => {
   const bpmForm = document.getElementById("bpm-form");
 
@@ -178,7 +249,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+artistSelect.addEventListener("change", () => {
+  const selectedArtist = artistSelect.value;
+  fetchSongsByArtistForSelect(selectedArtist);
+});
+
+songSelect.addEventListener("change", () => {
+  getLyricsButton.disabled = !songSelect.value;
+});
+
+getLyricsButton.addEventListener("click", () => {
+  const selectedArtist = artistSelect.value;
+  const selectedSong = songSelect.value;
+
+  fetchLyrics(selectedArtist, selectedSong);
+});
+
+document.addEventListener("DOMContentLoaded", fetchArtistsForSelect);
+
 // Funções executadas ao carregar a página
 fetchTopFiveSongs();
 fetchSongsByBpm();
-getTopArtists();

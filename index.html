@@ -61,7 +61,7 @@
       </div>
 
       <div
-        class="p-3  d-flex flex-column gap-1 border-2 rounded border-success bg-success bg-opacity-75 align-self-start">
+        class="p-3 d-flex flex-column gap-1 border-2 rounded border-success bg-success bg-opacity-75 align-self-start">
         <h2 class="h4">Melhores músicas por BPM</h2>
         <form
           class="d-flex align-items-start align-items-center gap-1"
@@ -92,6 +92,43 @@
           id="bpm-list">
           <!-- Top Bpm aqui -->
         </ul>
+      </div>
+
+      <!-- Lyrics finder -->
+      <div
+        class="p-3 col-6 row border border-2 rounded border-success bg-success bg-opacity-75 align-self-start">
+        <h2 class="h4">Encontre a letra</h2>
+        <p class="fst-italic text-body-tertiary">
+          Visualize a letra da música de um dos artistas mais escutados do
+          Spotify.
+        </p>
+        <div class="col-5 text-white d-flex flex-column gap-2">
+          <select
+            class="form-select"
+            name="artist_name"
+            id="artist-select"
+            id="">
+            <option selected>Selecione um artista</option>
+          </select>
+          <select
+            class="form-select"
+            name="track_name"
+            id="song-select"
+            disabled>
+            <option selected>Selecione uma música</option>
+          </select>
+          <button
+            class="btn btn-warning w-auto"
+            type="submit"
+            id="get-lyrics"
+            disabled>
+            Mostrar letra
+          </button>
+        </div>
+        <div class="col text-white" id="lyrics">
+          <span class="fst-italic">As letras carregarão aqui!</span>
+          <!-- Letras aqui -->
+        </div>
       </div>
     </main>
 
