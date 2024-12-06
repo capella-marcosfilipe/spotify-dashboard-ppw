@@ -130,6 +130,54 @@ function renderBPMSongsList(elementId, songs) {
   });
 }
 
+// Métodos de Top 5 para dançar ========================
+
+async function fetchSongsByDanceability() {
+  try {
+    const url = `https://parseapi.back4app.com/parse/classes/songs?order=-danceability&limit=5`;
+
+    const songs = await fetchSongs(url);
+
+    renderDanceabilitySongs("danceable-songs-list", songs);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+function renderDanceabilitySongs(elementId, songs) {
+  /**
+   * Formata as músicas encontradas em HTML
+   */
+  const songsList = document.getElementById(elementId);
+
+  songsList.innerHTML = "";
+
+  songs.forEach((song) => {
+    const listItem = document.createElement("li");
+    listItem.classList.add(
+      "list-group-item",
+      "bg-success",
+      "bg-opacity-10",
+      "text-light",
+      "border",
+      "border-0"
+    );
+    listItem.innerHTML = `
+      <span class="fs-5 fw-bold">${song.track_name}</span><br>
+      <span class="fs-6 fw-light">Artista:</span> <span class="fs-6 fw-semibold">${
+        song.artist_name
+      }</span><br>
+       <span class="fs-6 fw-light">Dançável:</span> <span class="fs-6 fw-semibold">${
+         song.danceability
+       }</span><br>
+      <span class="fs-6 fw-light">Streams:</span> <span class="fs-6 fw-semibold">${song.streams.toLocaleString(
+        "pt-br"
+      )}</span>
+    `;
+    songsList.appendChild(listItem);
+  });
+}
+
 // Métodos de Encontre a letra ========================
 
 const getLyricsButton = document.getElementById("get-lyrics");
@@ -270,3 +318,4 @@ document.addEventListener("DOMContentLoaded", fetchArtistsForSelect);
 // Funções executadas ao carregar a página
 fetchTopFiveSongs();
 fetchSongsByBpm();
+fetchSongsByDanceability();
