@@ -69,7 +69,7 @@ function renderSongsList(elementId, songs) {
     );
     listItem.innerHTML = `
       <span class="fs-5 fw-bold">${song.track_name}</span><br>
-      <span class="fs-6 fw-light">Artista:</span> <span class="fs-5 fw-semibold">${
+      <span class="fs-6 fw-light">Artista:</span> <span class="fs-6 fw-semibold">${
         song.artist_name
       }</span><br>
       <span class="fs-6 fw-light">Streams:</span> <span class="fs-6 fw-semibold">${song.streams.toLocaleString(
